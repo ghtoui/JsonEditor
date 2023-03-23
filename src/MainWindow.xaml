@@ -1,0 +1,237 @@
+﻿<Window x:Class="json_editor.GUIControllerClass"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:json_editor"
+        mc:Ignorable="d"
+        Title="JsonEditor" Height="400" Width="600"
+        Background="Gainsboro"
+        >
+
+    <!-- ボタンにマウスオーバーした時の処理
+        色を変えないように
+     -->
+    <Window.Resources>
+        <ControlTemplate x:Key="buttonHoverControlTemplate" TargetType="Button">
+            <Grid>
+                <Rectangle Fill="{TemplateBinding Background}"/>
+                <Border BorderBrush="Black" BorderThickness="1"></Border>
+                <ContentPresenter HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+            </Grid>
+        </ControlTemplate>
+
+        <Style TargetType="{x:Type Button}">
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Template" Value="{StaticResource buttonHoverControlTemplate}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+
+    <Grid>
+
+        <!--
+            行
+            Gridを区切ると綺麗に配置できる
+            高さを決める
+            Grid.Row で配置を決める
+            -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--
+            列
+            幅を決める
+            Grid.Columnで配置を決める
+        -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="5*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--
+            メニューバー
+        -->
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="4">
+            <Menu>
+                <MenuItem Header="ファイル">
+                    <MenuItem Header="開く" Click="open_json" />
+                    <MenuItem Header="名前を付けて保存" Click="new_save_json" />
+                    <MenuItem Header="保存" Click="save_json" />
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+
+        <!--
+            key
+        -->
+        <TextBlock Name="key_block"
+            Text="key"
+            Margin="50,-5,0,0"
+            Grid.Row="1" Grid.Column="0"
+            HorizontalAlignment="Left"
+            FontSize="12"
+        />
+        <TextBox Name="key_text"
+            TextChanged="changedtext"
+            Grid.Row="1" Grid.Column="0"
+            Margin="50, 10"
+        />
+        <Button Name="key_button" Content="key確定" Grid.Row="1" Grid.Column="1"
+            Click="key_click" />
+
+        <!--
+            value
+        -->
+        <TextBlock Name="value_block"
+            Text="value"
+            Margin="50,-5,0,0"
+            Grid.Row="2" Grid.Column="0"
+            HorizontalAlignment="Left"
+            FontSize="12"
+        />
+        <TextBox Name="value_text"
+            TextChanged="changedtext"
+            Grid.Row="2" Grid.Column="0"
+            Margin="50, 10"
+        />
+        <Button Name="value_button" Content="value確定" Grid.Row="2" Grid.Column="1"
+            Click="value_click" />
+
+        <!--
+            dict_openボタン
+        -->
+        <Button Name="label_dict_open" Content="{}{" Width="60" Grid.Row="3" Grid.Column="0"
+            Click="label_dict_open_click"
+            Margin="0,0,50,0" />
+        <!--
+            dict_closeボタン
+        -->
+        <Button Name="label_dict_close" Content="{}}" Width="60" Grid.Row="3" Grid.Column="0"
+            Click="label_dict_close_click" 
+            Margin="50,0,0,0" Background="Firebrick" />
+        <!--
+            list_openボタン
+        -->
+        <Button Name="label_list_open" Content="[" Width="60" Grid.Row="4" Grid.Column="0"
+            Click="label_list_open_click" FontSize="15" 
+            Margin="0,0,50,0" />
+        <!--
+            list_closeボタン
+        -->
+        <Button Name="label_list_close" Content="]" Width="60" Grid.Row="4" Grid.Column="0"
+            Click="label_list_close_click" FontSize="15"
+            Margin="50,0,0,0" Background="Firebrick" />
+        <!--
+            全削除ボタン
+        -->
+        <Button Name="delete_text" Content="全削除" Grid.Row="4" Grid.Column="1"
+            Click="delete_click" FontSize="15"
+            />
+        
+        <!--
+            dict_openまで削除ボタン
+        -->
+        <Button Name="delete_up_to_label" Content="｛まで&#xa;削除" Grid.Row="5" Grid.Column="1"
+            Click="delete_close_label" FontSize="15"
+            />
+
+        <!--
+            リスト変更ボタン
+        -->
+        <Button Content="リストに変更" 
+            Name="change_button"
+            Grid.Row="5" Grid.Column="2"
+            Click="json_list_manage" 
+            Margin="0,0,30,0" />
+
+        <!--
+            選択編集ボタン
+        -->
+        <Button Content="選択編集"
+            Name="itemedit_button"
+            Grid.Row="3" Grid.Column="3"
+            Click="edit_item"
+            Visibility="Collapsed"
+        />
+        
+        <!--
+            選択削除ボタン
+        -->
+        <Button Content="選択削除"
+            Name="itemdel_button"
+            Grid.Row="4" Grid.Column="3"
+            Click="delete_item"
+            Visibility="Collapsed"
+        />
+
+        <!--
+            入れ替えボタン
+        -->
+        <StackPanel VerticalAlignment="Center" Grid.Row="5" Grid.Column="3" Name="updownButton" Visibility="Collapsed">
+            <Button Name="upRow" Click="UpRow_Click">△</Button>
+            <Button Name="downRow" Margin="0,5,0,0" Click="DownRow_Click">▽</Button>
+        </StackPanel>
+
+        <!--
+            ファイル名
+        -->
+        <TextBlock Name="file_name_block"
+            Text="file name"
+            Margin="5,-7,0,0"
+            Grid.Row="1" Grid.Column="2"
+            HorizontalAlignment="Left"
+            FontSize="13"
+        />
+        <TextBox Name="file_name_text"
+            Text=""
+            TextChanged="changed_file_name"
+            Grid.Row="1" Grid.Column="2"
+            MinWidth="50" Height="100"
+            Margin="60, -10, 90, 30"
+            FontSize="12"
+        />
+        <!--
+            リスト作成
+        -->
+        <ListView Name="json_list" Grid.Row="1" Grid.Column="2"
+            Grid.RowSpan="4" Margin="0, 10, 30, 0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding item}" Width="1000"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        
+        <!--
+            プレビュー画面
+        -->
+        <TextBox Name="edit_text"
+            Background="Gainsboro"
+            IsReadOnly="True"
+            Grid.Row="1" Grid.Column="2"
+            Grid.RowSpan="4"
+            AcceptsReturn="True" 
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Visible"
+            Text="{Binding ElementName=jsonlist,
+            Path=SelectedItem.value}"
+            Margin="0, 10, 30, 0"
+        />
+
+    </Grid>
+</Window>
+
